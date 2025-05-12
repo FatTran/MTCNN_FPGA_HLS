@@ -50,6 +50,8 @@ void conv_mp_1_accel(float* input, /*float* weights,*/ float* output){
 #pragma HLS ARRAY_PARTITION variable=prelu_weight type=complete
 
     float out_conv[CONV1_OUT_SIZE * CONV1_OUT_SIZE * CONV1_FILTER] = {0};
+#pragma HLS BIND_STORAGE variable=out_conv type=ram_s2p impl=lutram
+#pragma HLS BIND_STORAGE variable=weights type=ram_s2p impl=lutram
     float sum = 0;
     int in_offset = 0;
     int weight_offset = 0;
@@ -66,16 +68,16 @@ void conv_mp_1_accel(float* input, /*float* weights,*/ float* output){
 #pragma HLS UNROLL off=true
 			ConvX:
 			for (int ifx = 0; ifx < CONV1_OUT_SIZE; ifx++){
-#pragma HLS PIPELINE off=false ii=27
+#pragma HLS PIPELINE off=true
 #pragma HLS UNROLL off=true
 				ConvChannel:
 				for (int inChan = 0; inChan < CONV1_IN_CHANNEL; inChan++) {
 #pragma HLS UNROLL off=true
-#pragma HLS PIPELINE off=true
+#pragma HLS PIPELINE off=false ii=47
 					ConvKy:
 					for (int ky = 0; ky < CONV1_SIZE; ky++) {
-#pragma HLS UNROLL off=true
-#pragma HLS PIPELINE off=false ii=16
+#pragma HLS UNROLL off=false
+#pragma HLS PIPELINE off=true
 //#pragma HLS PIPELINE off=true
 						ConvKx:
 						for (int kx = 0; kx < CONV1_SIZE; kx++) {
@@ -169,6 +171,8 @@ void conv_2_accel(float* input, /*float* weights,*/ float* output){
 	};
 #pragma HLS ARRAY_PARTITION variable=bias type=complete
 #pragma HLS ARRAY_PARTITION variable=prelu_weight type=complete
+//#pragma HLS BIND_STORAGE variable=out_conv type=ram_s2p impl=lutram
+#pragma HLS BIND_STORAGE variable=weights type=ram_s2p impl=lutram
 
     float sum = 0;
     int in_offset = 0;
@@ -301,6 +305,7 @@ void conv_3_accel(float* input, /*float* weights,*/ float* output){
 	};
 #pragma HLS ARRAY_PARTITION variable=bias type=complete
 #pragma HLS ARRAY_PARTITION variable=prelu_weight type=complete
+#pragma HLS BIND_STORAGE variable=weights type=ram_s2p impl=lutram
 
     float sum = 0;
     int in_offset = 0;
@@ -372,7 +377,7 @@ void conv_4_1_accel(float* input, /*float* weights,*/ float* output){
 	static float weights[64] = {
 		0.072511, 0.117792, -0.556144, 0.051560, 0.185822, -0.037323, 0.135413, -0.060478, -0.455433, 0.313242, 0.186989, -0.306009, 0.018781, 0.123265, 0.360059, 0.202651, 0.368453, -0.001883, -0.296884, 0.181225, -0.360951, -0.079781, -0.140764, -0.181552, -0.296242, 0.247635, 0.258857, -0.016117, -0.356732, -0.205728, 0.114280, 0.634373, -0.342884, -0.288781, 0.179281, -0.343183, -0.243206, 0.413078, -0.248983, -0.235375, 0.204416, -0.116794, -0.478733, 0.243536, -0.505043, 0.018334, -0.203342, -0.369456, -0.136155, -0.226551, 0.104038, -0.258832, 0.206178, 0.429571, 0.457669, 0.318273, 0.554305, -0.331395, -0.416961, 0.149952, 0.577524, 0.302908, -0.210975, -0.041370
 	};
-
+#pragma HLS BIND_STORAGE variable=weights type=ram_s2p impl=lutram
 //#pragma HLS ARRAY_PARTITION variable=bias type=complete
 
     float sum = 0;
@@ -447,7 +452,7 @@ void conv_4_2_accel(float* input, /*float* weights,*/ float* output){
 	static float weights[128] = {
 		-0.005870, 0.015571, 0.005003, -0.003944, 0.002900, 0.034314, -0.002520, -0.018843, -0.014383, -0.010140, 0.002019, 0.006581, -0.006122, -0.009227, -0.000490, 0.002741, -0.008608, 0.198162, -0.044809, -0.048052, 0.002380, -0.000880, -0.010912, 0.006155, -0.004870, 0.002578, -0.039007, -0.158926, 0.003941, 0.007065, 0.005106, 0.030155, -0.008644, 0.009465, 0.005073, -0.007576, 0.000782, 0.001792, -0.055285, 0.040634, -0.006000, -0.016816, -0.003970, 0.010911, 0.000678, 0.075716, 0.000194, 0.007050, -0.006151, 0.192200, -0.126897, -0.015194, 0.005650, -0.004341, -0.019993, 0.009478, -0.003947, 0.007743, -0.094134, 0.091572, 0.004043, 0.004578, 0.003089, -0.023155, 0.004609, 0.018492, -0.008931, 0.010024, 0.004117, 0.006941, 0.008713, -0.099257, 0.014482, 0.004391, 0.016492, -0.005597, 0.005003, 0.009737, 0.001330, 0.001356, 0.009439, 0.071269, 0.136190, -0.004529, -0.004970, 0.002164, 0.008081, -0.004359, 0.004371, 0.023822, -0.140253, -0.054614, -0.001354, -0.004032, -0.001179, 0.046909, 0.005949, 0.015567, -0.007865, 0.009068, 0.002348, -0.034922, -0.045422, -0.039146, 0.039347, -0.000091, 0.019363, -0.011810, 0.009478, 0.117788, 0.001411, 0.005314, 0.006146, -0.057950, -0.048868, 0.025460, -0.007305, 0.008335, 0.005434, -0.005966, 0.010837, 0.021893, -0.131173, 0.156970, 0.003240, -0.007253, -0.004159, 0.018484
 	};
-
+#pragma HLS BIND_STORAGE variable=weights type=ram_s2p impl=lutram
 //#pragma HLS ARRAY_PARTITION variable=bias type=complete
 
     float sum = 0;
@@ -540,6 +545,7 @@ void duplicateArray(float input[], float output1[], float output2[], const int i
 
 void pnet_accel(float* input, float* output1, float* output2){
 //#pragma HLS PIPELINE off
+#pragma HLS INTERFACE mode=s_axilite port=return
 #pragma HLS INTERFACE mode=m_axi port=input offset=slave bundle=gmem0 depth = INPUT_SIZE * INPUT_SIZE * CONV1_IN_CHANNEL
 #pragma HLS INTERFACE mode=m_axi port=output1 offset=slave bundle=gmem1 depth = CONV4_1_OUT_SIZE * CONV4_1_OUT_SIZE * CONV4_1_FILTER
 #pragma HLS INTERFACE mode=m_axi port=output2 offset=slave bundle=gmem2 depth = CONV4_2_OUT_SIZE * CONV4_2_OUT_SIZE * CONV4_2_FILTER
@@ -552,6 +558,12 @@ void pnet_accel(float* input, float* output1, float* output2){
     float out3[CONV3_OUT_SIZE * CONV3_OUT_SIZE * CONV3_FILTER] = {0};
     float out4[CONV3_OUT_SIZE * CONV3_OUT_SIZE * CONV3_FILTER] = {0};
     float out5[CONV3_OUT_SIZE * CONV3_OUT_SIZE * CONV3_FILTER] = {0};
+
+#pragma HLS BIND_STORAGE variable=out1 type=ram_s2p impl=lutram
+#pragma HLS BIND_STORAGE variable=out2 type=ram_s2p impl=lutram
+#pragma HLS BIND_STORAGE variable=out3 type=ram_s2p impl=lutram
+#pragma HLS BIND_STORAGE variable=out4 type=ram_s2p impl=lutram
+#pragma HLS BIND_STORAGE variable=out5 type=ram_s2p impl=lutram
 
 //#pragma HLS STREAM variable=out1 depth=POOL1_OUT_SIZE * POOL1_OUT_SIZE * CONV1_FILTER;
 //#pragma HLS STREAM variable=out2 depth=CONV2_OUT_SIZE * CONV2_OUT_SIZE * CONV2_FILTER;
