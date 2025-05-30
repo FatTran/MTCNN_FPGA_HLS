@@ -70,6 +70,7 @@
 #define FC2_3_DENSE_SIZE 10
 
 float prelu(float input, float alpha);
+void conv_1_accel(float* input, float* output);
 // void conv_mp_1_accel(float* input, float* weights, float* output);
 // void conv_mp_2_accel(float* input, float* weights, float* output);
 // void conv_3_accel(float* input, float* weights, float* output);
