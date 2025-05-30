@@ -9,6 +9,9 @@ from matplotlib import pyplot as plt
 import rnet_weights
 import onet_weights
 
+
+#Note: chua co lop softmax trong kernel hardware, co the them softmax tren host
+
 overlay = Overlay("mtcnn_base.bit")
 
 pnet_overlay = overlay.pnet_accel_0
