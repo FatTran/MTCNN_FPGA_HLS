@@ -180,14 +180,14 @@ def pnet_hw(image):
         count_y += 1
     return offset, prob
 
-def rnet_hw(image_boxes):
+def rnet_hw(image_boxes, dense_1_weights):
     patch_size = (24, 24)
     stride = 2
     batch, channel, box_height, box_width  = image_boxes.shape
     offset = torch.zeros(shape=(batch, 4), dtype=np.float32)
     prob = torch.zeros(shape=(batch, 2), dtype=np.float32)
     for i in range(batch):
-        out2, out1 = rnet_driver(image_boxes[i][:][:][:]) 
+        out2, out1 = rnet_driver(image_boxes[i][:][:][:], dense_1_weights) 
         out1 = softmax(out1)
         for j in range(4):
             offset[i][j] = out2[j]
@@ -195,7 +195,7 @@ def rnet_hw(image_boxes):
             prob[i][k] = out1[k]
     return offset, prob
 
-def onet_hw(image_boxes):
+def onet_hw(image_boxes, conv_mp_3_weights, dense_1_weights):
     patch_size = (48, 48)
     stride = 2
     batch, channel, box_height, box_width = image_boxes.shape
@@ -204,7 +204,7 @@ def onet_hw(image_boxes):
     prob = torch.zeros(shape=(batch, 2), dtype=np.float32)
 
     for i in range(batch):
-        out3, out2, out1 = onet_driver(image_boxes[i][:][:][:])
+        out3, out2, out1 = onet_driver(image_boxes[i][:][:][:], conv_mp_3_weights, dense_1_weights)
         out1 = softmax(out1)
         for j in range(10):
             landmark[i][j] = out3[j]
